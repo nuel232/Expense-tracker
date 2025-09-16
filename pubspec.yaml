@@ -39,6 +39,7 @@ dependencies:
   provider: ^6.1.5+1
   google_fonts: ^6.3.1
   google_nav_bar: ^5.0.7
+  font_awesome_flutter: ^10.9.1
 
 dev_dependencies:
   flutter_test:
