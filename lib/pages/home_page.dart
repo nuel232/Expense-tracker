@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: MyNavBar(
         onTabChange: (index) => navigateButtomBar(index),
       ),
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Theme.of(context).colorScheme.surface,
 
       body: _pages[_selectedIndex],
     );
