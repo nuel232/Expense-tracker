@@ -3,6 +3,7 @@ import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:expense_tracker/util/transaction_tile.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -36,7 +37,7 @@ class _DashboardPageState extends State<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         toolbarHeight: 70,
         backgroundColor: Colors.transparent,
@@ -72,7 +73,10 @@ class _DashboardPageState extends State<DashboardPage> {
                   color: Colors.grey.shade200,
                   border: Border.all(color: Colors.grey.shade400),
                   gradient: LinearGradient(
-                    colors: [Colors.grey.shade100, Colors.grey.shade300],
+                    colors: [
+                      Theme.of(context).colorScheme.tertiary,
+                      Theme.of(context).colorScheme.primary,
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -144,7 +148,10 @@ class _DashboardPageState extends State<DashboardPage> {
                     decoration: BoxDecoration(
                       // color: Colors.grey.shade200,
                       gradient: LinearGradient(
-                        colors: [Colors.grey.shade100, Colors.grey.shade300],
+                        colors: [
+                          Theme.of(context).colorScheme.tertiary,
+                          Theme.of(context).colorScheme.primary,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -180,7 +187,10 @@ class _DashboardPageState extends State<DashboardPage> {
                     decoration: BoxDecoration(
                       // color: Colors.grey.shade200,
                       gradient: LinearGradient(
-                        colors: [Colors.grey.shade100, Colors.grey.shade300],
+                        colors: [
+                          Theme.of(context).colorScheme.tertiary,
+                          Theme.of(context).colorScheme.primary,
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
@@ -236,7 +246,10 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                   ],
                   gradient: LinearGradient(
-                    colors: [Colors.grey.shade100, Colors.grey.shade300],
+                    colors: [
+                      Theme.of(context).colorScheme.tertiary,
+                      Theme.of(context).colorScheme.primary,
+                    ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),

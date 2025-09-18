@@ -10,10 +10,10 @@ class MyNavBar extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10),
       child: GNav(
-        color: Colors.grey[500],
-        activeColor: Colors.grey.shade700,
+        color: Theme.of(context).colorScheme.inversePrimary,
+        activeColor: Theme.of(context).colorScheme.inverseSurface,
         tabActiveBorder: Border.all(color: Colors.white),
-        tabBackgroundColor: Colors.grey.shade100,
+        tabBackgroundColor: Theme.of(context).colorScheme.primary,
         mainAxisAlignment: MainAxisAlignment.center,
         tabBorderRadius: 10,
         onTabChange: (value) => onTabChange!(value),

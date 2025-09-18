@@ -6,11 +6,8 @@ class StatisticPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController amountController = TextEditingController();
-    TextEditingController NoteController = TextEditingController();
-
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         toolbarHeight: 70,
         backgroundColor: Colors.transparent,
@@ -33,27 +30,7 @@ class StatisticPage extends StatelessWidget {
         ],
       ),
 
-      body: Container(
-        child: Column(
-          children: [
-            Text('Amount'),
-            TextField(controller: amountController),
-
-            //Category
-            Text('Category'),
-            Container(),
-
-            //date
-            Text('Date'),
-            Container(),
-
-            //note
-            Text('Note'),
-
-            TextField(controller: NoteController),
-          ],
-        ),
-      ),
+      body: Column(children: []),
     );
   }
 }

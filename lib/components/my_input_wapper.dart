@@ -13,14 +13,14 @@ class MyInputWrapper extends StatelessWidget {
         labelText: labelText,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade400),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           borderRadius: BorderRadius.circular(12),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           borderRadius: BorderRadius.circular(12),
         ),
-        fillColor: Colors.grey.shade300,
+        fillColor: Theme.of(context).colorScheme.secondary,
         filled: true,
       ),
       child: child,

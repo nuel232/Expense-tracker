@@ -4,16 +4,22 @@ import 'package:expense_tracker/components/my_textfield.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 
-class ExpensePage extends StatelessWidget {
+class ExpensePage extends StatefulWidget {
   ExpensePage({super.key});
 
+  @override
+  State<ExpensePage> createState() => _ExpensePageState();
+}
+
+class _ExpensePageState extends State<ExpensePage> {
   TextEditingController amountController = TextEditingController();
+
   TextEditingController NoteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         toolbarHeight: 70,
         backgroundColor: Colors.transparent,
@@ -41,8 +47,24 @@ class ExpensePage extends StatelessWidget {
           padding: const EdgeInsets.all(23.0),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: Theme.of(context).colorScheme.secondary,
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade500.withOpacity(0.3),
+                  spreadRadius: 0.5,
+                  blurRadius: 0.5,
+                  offset: Offset(4, 4),
+                ),
+              ],
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.tertiary,
+                  Theme.of(context).colorScheme.primary,
+                ],
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.only(
@@ -84,7 +106,7 @@ class ExpensePage extends StatelessWidget {
 
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue,
+                        color: Colors.grey.shade800,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Padding(
