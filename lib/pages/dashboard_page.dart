@@ -1,3 +1,5 @@
+import 'package:expense_tracker/models/category.dart';
+import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:expense_tracker/util/transaction_tile.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +12,52 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
+  final List<ExpenseDetails> expenses = [
+    ExpenseDetails(
+      amount: 2500,
+      category: Category.food,
+      date: DateTime.now(),
+      note: "Lunch at KFC",
+    ),
+    ExpenseDetails(
+      amount: 8000,
+      category: Category.bills,
+      date: DateTime.now(),
+      note: "Electricity Bill",
+    ),
+    ExpenseDetails(
+      amount: 1500,
+      category: Category.transport,
+      date: DateTime.now(),
+      note: "Taxi ride",
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[300],
+      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        toolbarHeight: 70,
+        backgroundColor: Colors.transparent,
+        title: Text('Expense tracker'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: CircleAvatar(
+              child: IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProfilePage()),
+                  );
+                },
+                icon: Icon(Icons.person),
+              ),
+            ),
+          ),
+        ],
+      ),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -27,6 +71,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
                   border: Border.all(color: Colors.grey.shade400),
+                  gradient: LinearGradient(
+                    colors: [Colors.grey.shade100, Colors.grey.shade300],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
 
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
@@ -93,7 +142,12 @@ class _DashboardPageState extends State<DashboardPage> {
                     margin: EdgeInsets.all(10),
 
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                      // color: Colors.grey.shade200,
+                      gradient: LinearGradient(
+                        colors: [Colors.grey.shade100, Colors.grey.shade300],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
 
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.grey.shade400),
@@ -124,7 +178,12 @@ class _DashboardPageState extends State<DashboardPage> {
                     margin: EdgeInsets.all(10),
 
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade200,
+                      // color: Colors.grey.shade200,
+                      gradient: LinearGradient(
+                        colors: [Colors.grey.shade100, Colors.grey.shade300],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
 
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.grey.shade400),
@@ -161,11 +220,12 @@ class _DashboardPageState extends State<DashboardPage> {
                 ),
               ),
 
+              //recent transactions
               Container(
                 margin: EdgeInsets.all(20),
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
+                  // color: Colors.grey.shade200,
                   border: Border.all(color: Colors.grey.shade400),
                   boxShadow: [
                     BoxShadow(
@@ -175,15 +235,21 @@ class _DashboardPageState extends State<DashboardPage> {
                       offset: Offset(4, 4),
                     ),
                   ],
+                  gradient: LinearGradient(
+                    colors: [Colors.grey.shade100, Colors.grey.shade300],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
 
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
-                  children: [
-                    TransactionTile(),
-                    TransactionTile(),
-                    TransactionTile(),
-                  ],
+                  children: expenses
+                      .map(
+                        (ExpenseDetails) =>
+                            TransactionTile(expenseDetails: ExpenseDetails),
+                      )
+                      .toList(),
                 ),
               ),
             ],

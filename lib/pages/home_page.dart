@@ -41,28 +41,7 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: MyNavBar(
         onTabChange: (index) => navigateButtomBar(index),
       ),
-      backgroundColor: Colors.grey[300],
-      appBar: AppBar(
-        toolbarHeight: 70,
-        backgroundColor: Colors.transparent,
-        title: Text('Expense tracker'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: CircleAvatar(
-              child: IconButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProfilePage()),
-                  );
-                },
-                icon: Icon(Icons.person),
-              ),
-            ),
-          ),
-        ],
-      ),
+      backgroundColor: Colors.grey[200],
 
       body: _pages[_selectedIndex],
     );

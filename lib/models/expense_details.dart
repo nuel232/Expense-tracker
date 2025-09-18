@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:expense_tracker/models/category.dart';
 
 class ExpenseDetails {
   final double amount;
