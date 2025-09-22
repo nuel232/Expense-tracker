@@ -1,14 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:hive/hive.dart';
 
+part 'category.g.dart';
+
+@HiveType(typeId: 1)
 enum Category {
+  @HiveField(0)
   food,
+  @HiveField(1)
   bills,
+  @HiveField(2)
   transport,
+  @HiveField(3)
   shopping,
+  @HiveField(4)
   entertainment,
+  @HiveField(5)
   health,
+  @HiveField(6)
   income,
+  @HiveField(7)
   other,
 }
 

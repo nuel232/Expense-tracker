@@ -1,3 +1,4 @@
+import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
@@ -13,29 +14,33 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  final List<ExpenseDetails> expenses = [
-    ExpenseDetails(
-      amount: 2500,
-      category: Category.food,
-      date: DateTime.now(),
-      note: "Lunch at KFC",
-    ),
-    ExpenseDetails(
-      amount: 8000,
-      category: Category.bills,
-      date: DateTime.now(),
-      note: "Electricity Bill",
-    ),
-    ExpenseDetails(
-      amount: 1500,
-      category: Category.transport,
-      date: DateTime.now(),
-      note: "Taxi ride",
-    ),
-  ];
+  // final List<ExpenseDetails> expenses = [
+  //   ExpenseDetails(
+  //     amount: 2500,
+  //     category: Category.food,
+  //     date: DateTime.now(),
+  //     note: "Lunch at KFC",
+  //   ),
+  //   ExpenseDetails(
+  //     amount: 8000,
+  //     category: Category.bills,
+  //     date: DateTime.now(),
+  //     note: "Electricity Bill",
+  //   ),
+  //   ExpenseDetails(
+  //     amount: 1500,
+  //     category: Category.transport,
+  //     date: DateTime.now(),
+  //     note: "Taxi ride",
+  //   ),
+  // ];
 
   @override
   Widget build(BuildContext context) {
+    //Expense Database
+    final expenseDatabase = context.watch<ExpenseDatabase>();
+    List<ExpenseDetails> currentExpenses = expenseDatabase.currentExpenses;
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
@@ -257,7 +262,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
-                  children: expenses
+                  children: currentExpenses
                       .map(
                         (ExpenseDetails) =>
                             TransactionTile(expenseDetails: ExpenseDetails),

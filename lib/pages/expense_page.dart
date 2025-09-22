@@ -1,8 +1,14 @@
 import 'package:expense_tracker/components/my_date_picker_field.dart';
 import 'package:expense_tracker/components/my_dropdown_menu.dart';
+import 'package:expense_tracker/models/category.dart' as model;
+
 import 'package:expense_tracker/components/my_textfield.dart';
+import 'package:expense_tracker/database/expense_database.dart';
+import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
+import 'package:expense_tracker/util/thousands_separator_input_formatter.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ExpensePage extends StatefulWidget {
   ExpensePage({super.key});
@@ -15,6 +21,9 @@ class _ExpensePageState extends State<ExpensePage> {
   TextEditingController amountController = TextEditingController();
 
   TextEditingController noteController = TextEditingController();
+
+  model.Category? selectedCategory;
+  DateTime? selectedDate;
 
   @override
   Widget build(BuildContext context) {
@@ -81,17 +90,29 @@ class _ExpensePageState extends State<ExpensePage> {
                     MyTextfield(
                       controller: amountController,
                       keyboardType: TextInputType.number,
+                      prefixText: '₦  ',
+                      inputFormatters: [ThousandsSeparatorInputFormatter()],
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                      hintText: 'Enter Amount',
                     ),
                     SizedBox(height: 20),
 
                     Text('Category', style: TextStyle(fontSize: 18)),
-                    MyDropdownMenu(),
+                    MyDropdownMenu(
+                      onCategorySelected: (c) {
+                        selectedCategory = c;
+                      },
+                    ),
                     SizedBox(height: 20),
 
                     Text('Date', style: TextStyle(fontSize: 18)),
                     MyDatePickerField(
                       onDateSelected: (date) {
-                        print("Picked date: $date");
+                        selectedDate = date;
                       },
                     ),
                     SizedBox(height: 20),
@@ -104,20 +125,49 @@ class _ExpensePageState extends State<ExpensePage> {
 
                     SizedBox(height: 20),
 
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade800,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(25.0),
-                        child: Center(
-                          child: Text(
-                            'save',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
+                    GestureDetector(
+                      onTap: () {
+                        if (amountController.text.isEmpty ||
+                            selectedCategory == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Amount and Category are required'),
+                            ),
+                          );
+                          return;
+                        }
+                        String rawAmount = amountController.text
+                            .replaceAll('₦', '')
+                            .replaceAll(',', '')
+                            .trim();
+                        final expense = ExpenseDetails(
+                          amount: double.tryParse(rawAmount) ?? 0,
+                          category: selectedCategory!,
+                          date: selectedDate ?? DateTime.now(),
+                          note: noteController.text,
+                        );
+
+                        //add to database
+                        context.read<ExpenseDatabase>().addExpenses(expense);
+
+                        amountController.clear();
+                        noteController.clear();
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade800,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(25.0),
+                          child: Center(
+                            child: Text(
+                              'save',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                         ),

@@ -3,14 +3,15 @@ import 'package:expense_tracker/models/category.dart';
 import 'package:flutter/material.dart';
 
 class MyDropdownMenu extends StatefulWidget {
-  const MyDropdownMenu({super.key});
+  final ValueChanged<Category?> onCategorySelected;
+  const MyDropdownMenu({super.key, required this.onCategorySelected});
 
   @override
   State<MyDropdownMenu> createState() => _MyDropdownMenuState();
 }
 
 class _MyDropdownMenuState extends State<MyDropdownMenu> {
-  Category? _selectedCategory = Category.food;
+  Category? selectedCategory = Category.food;
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class _MyDropdownMenuState extends State<MyDropdownMenu> {
         MyInputWrapper(
           child: DropdownButtonHideUnderline(
             child: DropdownButton<Category>(
-              value: _selectedCategory,
+              value: selectedCategory,
               isExpanded: true,
               items: Category.values.map((c) {
                 return DropdownMenuItem(
@@ -33,7 +34,10 @@ class _MyDropdownMenuState extends State<MyDropdownMenu> {
                   ),
                 );
               }).toList(),
-              onChanged: (c) => setState(() => _selectedCategory = c),
+              onChanged: (c) {
+                setState(() => selectedCategory = c);
+                widget.onCategorySelected(c);
+              },
             ),
           ),
         ),
