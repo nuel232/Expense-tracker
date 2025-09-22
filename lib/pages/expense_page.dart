@@ -14,7 +14,7 @@ class ExpensePage extends StatefulWidget {
 class _ExpensePageState extends State<ExpensePage> {
   TextEditingController amountController = TextEditingController();
 
-  TextEditingController NoteController = TextEditingController();
+  TextEditingController noteController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +98,7 @@ class _ExpensePageState extends State<ExpensePage> {
 
                     Text('Note', style: TextStyle(fontSize: 18)),
                     MyTextfield(
-                      controller: NoteController,
+                      controller: noteController,
                       hintText: 'Optional',
                     ),
 
