@@ -1,6 +1,8 @@
+import 'package:expense_tracker/components/grouped_transactions.dart';
 import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
+import 'package:expense_tracker/pages/history_page.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:expense_tracker/util/transaction_tile.dart';
 import 'package:flutter/material.dart';
@@ -14,32 +16,14 @@ class DashboardPage extends StatefulWidget {
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  // final List<ExpenseDetails> expenses = [
-  //   ExpenseDetails(
-  //     amount: 2500,
-  //     category: Category.food,
-  //     date: DateTime.now(),
-  //     note: "Lunch at KFC",
-  //   ),
-  //   ExpenseDetails(
-  //     amount: 8000,
-  //     category: Category.bills,
-  //     date: DateTime.now(),
-  //     note: "Electricity Bill",
-  //   ),
-  //   ExpenseDetails(
-  //     amount: 1500,
-  //     category: Category.transport,
-  //     date: DateTime.now(),
-  //     note: "Taxi ride",
-  //   ),
-  // ];
-
   @override
   Widget build(BuildContext context) {
     //Expense Database
     final expenseDatabase = context.watch<ExpenseDatabase>();
-    List<ExpenseDetails> currentExpenses = expenseDatabase.currentExpenses;
+    List<ExpenseDetails> currentExpenses = expenseDatabase
+        .currentExpenses
+        .reversed
+        .toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -67,7 +51,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(top: 25.0),
+          padding: const EdgeInsets.only(top: 5.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -75,8 +59,10 @@ class _DashboardPageState extends State<DashboardPage> {
                 margin: EdgeInsets.all(20),
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  border: Border.all(color: Colors.grey.shade400),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+
                   gradient: LinearGradient(
                     colors: [
                       Theme.of(context).colorScheme.tertiary,
@@ -119,11 +105,24 @@ class _DashboardPageState extends State<DashboardPage> {
                             ],
                           ),
 
-                          Row(
-                            children: [
-                              Text('history'),
-                              Icon(Icons.arrow_forward_ios_outlined, size: 15),
-                            ],
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => HistoryPage(),
+                                ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Text('history'),
+                                Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                  size: 15,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -152,6 +151,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
                     decoration: BoxDecoration(
                       // color: Colors.grey.shade200,
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                       gradient: LinearGradient(
                         colors: [
                           Theme.of(context).colorScheme.tertiary,
@@ -162,7 +164,6 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
 
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey.shade400),
 
                       boxShadow: [
                         BoxShadow(
@@ -201,7 +202,9 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
 
                       borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.grey.shade400),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.shade500.withOpacity(0.1),
@@ -240,8 +243,9 @@ class _DashboardPageState extends State<DashboardPage> {
                 margin: EdgeInsets.all(20),
                 padding: EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  // color: Colors.grey.shade200,
-                  border: Border.all(color: Colors.grey.shade400),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.grey.shade500.withOpacity(0.1),
@@ -261,13 +265,19 @@ class _DashboardPageState extends State<DashboardPage> {
 
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Column(
-                  children: currentExpenses
-                      .map(
-                        (ExpenseDetails) =>
-                            TransactionTile(expenseDetails: ExpenseDetails),
-                      )
-                      .toList(),
+                constraints: BoxConstraints(
+                  maxHeight: 350, // adjust to fit 5 tiles comfortably
+                ),
+
+                child: ListView(
+                  children: [
+                    GroupedTransactions(
+                      expenses: currentExpenses,
+
+                      showDateTotals: false,
+                      emptyMessage: 'No recent transactions',
+                    ),
+                  ],
                 ),
               ),
             ],

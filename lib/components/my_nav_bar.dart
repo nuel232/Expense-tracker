@@ -12,7 +12,9 @@ class MyNavBar extends StatelessWidget {
       child: GNav(
         color: Theme.of(context).colorScheme.inversePrimary,
         activeColor: Theme.of(context).colorScheme.inverseSurface,
-        tabActiveBorder: Border.all(color: Colors.white),
+        tabActiveBorder: Border.all(
+          color: Theme.of(context).colorScheme.primary,
+        ),
         tabBackgroundColor: Theme.of(context).colorScheme.primary,
         mainAxisAlignment: MainAxisAlignment.center,
         tabBorderRadius: 10,

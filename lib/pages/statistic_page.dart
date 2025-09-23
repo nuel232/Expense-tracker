@@ -25,7 +25,7 @@ class StatisticPage extends StatelessWidget {
                 margin: EdgeInsets.symmetric(horizontal: 20),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  color: Colors.grey.shade300,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
                 child: TabBar(
                   indicatorSize: TabBarIndicatorSize.tab,

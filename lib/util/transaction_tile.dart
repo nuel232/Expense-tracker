@@ -1,24 +1,36 @@
 import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class TransactionTile extends StatelessWidget {
   final ExpenseDetails expenseDetails;
-  const TransactionTile({super.key, required this.expenseDetails});
+  final Widget? subtitle;
+  const TransactionTile({
+    super.key,
+    required this.expenseDetails,
+    this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
+    // Create a NumberFormat instance for thousands separator
+    final formatter = NumberFormat.decimalPattern();
     return ListTile(
-      leading: Icon(
-        expenseDetails.category.icon,
-        color: expenseDetails.category.color,
+      leading: CircleAvatar(
+        backgroundColor: expenseDetails.category.color.withOpacity(0.1),
+        child: Icon(
+          expenseDetails.category.icon,
+          color: expenseDetails.category.color,
+        ),
       ),
       title: Text(
         expenseDetails.category.label,
         style: TextStyle(fontSize: 17),
       ),
+      subtitle: subtitle,
       trailing: Text(
-        '₦${expenseDetails.amount.toStringAsFixed(0)}',
+        '₦${formatter.format(expenseDetails.amount)}',
         style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.bold,
