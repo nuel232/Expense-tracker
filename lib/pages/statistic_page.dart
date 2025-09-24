@@ -1,13 +1,20 @@
+import 'package:expense_tracker/components/catergory_spending_bar.dart';
 import 'package:expense_tracker/components/tab_item.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 class StatisticPage extends StatelessWidget {
-  const StatisticPage({super.key});
+  StatisticPage({super.key});
+  final Map<String, double> categoryTotals = {
+    "Food": 25000,
+    "Transport": 12000,
+    "Shopping": 18000,
+  };
 
   @override
   Widget build(BuildContext context) {
+    final maxAmount = categoryTotals.values.reduce((a, b) => a > b ? a : b);
     return DefaultTabController(
       length: 3,
       child: Scaffold(
@@ -63,7 +70,22 @@ class StatisticPage extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            Center(child: Text('weekly')),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: categoryTotals.entries.map((entry) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(entry.key),
+                    CategorySpendingBar(
+                      category: entry.key,
+                      amount: entry.value,
+                      maxAmount: maxAmount,
+                    ),
+                  ],
+                );
+              }).toList(),
+            ),
             Center(child: Text('Monthly')),
             Center(child: Text('Yearly')),
           ],

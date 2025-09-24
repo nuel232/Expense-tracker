@@ -31,6 +31,17 @@ class ExpenseDetails extends HiveObject {
     'note': note,
   };
 
+  Map<String, double> calculateCategoryTotals(List<ExpenseDetails> expenses) {
+    final Map<String, double> totals = {};
+
+    for (var expense in expenses) {
+      final key = expense.category.label; // e.g. "Food", "Transport"
+      totals[key] = (totals[key] ?? 0) + expense.amount;
+    }
+
+    return totals;
+  }
+
   static ExpenseDetails fromMap(Map m) => ExpenseDetails(
     category: Category.values.firstWhere((e) => e.name == m['category']),
     amount: (m['amount'] as num).toDouble(),

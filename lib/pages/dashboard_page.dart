@@ -1,10 +1,8 @@
 import 'package:expense_tracker/components/grouped_transactions.dart';
 import 'package:expense_tracker/database/expense_database.dart';
-import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/history_page.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
-import 'package:expense_tracker/util/transaction_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

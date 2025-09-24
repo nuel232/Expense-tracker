@@ -23,7 +23,6 @@ class MyNavBar extends StatelessWidget {
         tabs: [
           GButton(icon: Icons.home, text: 'home'),
           GButton(icon: Icons.add, text: 'Expenses'),
-
           GButton(icon: Icons.shopping_bag, text: 'statistic'),
         ],
       ),

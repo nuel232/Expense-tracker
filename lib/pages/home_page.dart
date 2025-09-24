@@ -1,7 +1,6 @@
 import 'package:expense_tracker/components/my_nav_bar.dart';
 import 'package:expense_tracker/pages/dashboard_page.dart';
 import 'package:expense_tracker/pages/expense_page.dart';
-import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:expense_tracker/pages/statistic_page.dart';
 import 'package:flutter/material.dart';
 

@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class ExpensePage extends StatefulWidget {
-  ExpensePage({super.key});
+  const ExpensePage({super.key});
 
   @override
   State<ExpensePage> createState() => _ExpensePageState();
