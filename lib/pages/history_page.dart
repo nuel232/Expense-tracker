@@ -63,7 +63,7 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             GroupedTransactions(
               expenses: currentExpenses,
-              groupedByMonth: true,
+              groupingPeriod: GroupingPeriod.monthly,
 
               showDateTotals: true,
               emptyMessage: 'No recent transactions',

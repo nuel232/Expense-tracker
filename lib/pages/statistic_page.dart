@@ -1,4 +1,5 @@
 import 'package:expense_tracker/components/catergory_spending_bar.dart';
+import 'package:expense_tracker/components/pie_chart_painter.dart';
 import 'package:expense_tracker/components/tab_item.dart';
 import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/models/category.dart';
@@ -8,6 +9,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
 
+// Import the enhanced GroupedTransactions
+import 'package:expense_tracker/components/grouped_transactions.dart';
+
 class StatisticPage extends StatefulWidget {
   const StatisticPage({super.key});
 
@@ -16,41 +20,43 @@ class StatisticPage extends StatefulWidget {
 }
 
 class _StatisticPageState extends State<StatisticPage> {
-  bool showPieChart = true;
-  // Calculate category totals for a specific time period
-  Map<String, double> calculateCategoryTotals(
+  // Helper method to get expenses filtered by period
+  List<ExpenseDetails> getExpensesForPeriod(
     List<ExpenseDetails> expenses,
-    String period,
+    GroupingPeriod period,
   ) {
-    final Map<String, double> totals = {};
     final DateTime now = DateTime.now();
 
-    // Filter expenses based on time period
-    List<ExpenseDetails> filteredExpenses = expenses.where((expense) {
-      // Exclude income from category spending analysis
-      if (expense.category == Category.income) return false;
-
+    return expenses.where((expense) {
       switch (period) {
-        case 'weekly':
+        case GroupingPeriod.weekly:
           final weekStart = now.subtract(Duration(days: now.weekday - 1));
           final weekEnd = weekStart.add(Duration(days: 6));
           return expense.date.isAfter(weekStart.subtract(Duration(days: 1))) &&
               expense.date.isBefore(weekEnd.add(Duration(days: 1)));
 
-        case 'monthly':
+        case GroupingPeriod.monthly:
           return expense.date.year == now.year &&
               expense.date.month == now.month;
 
-        case 'yearly':
+        case GroupingPeriod.yearly:
           return expense.date.year == now.year;
 
+        case GroupingPeriod.daily:
         default:
           return true;
       }
     }).toList();
+  }
 
-    // Calculate totals for each category
-    for (var expense in filteredExpenses) {
+  // Calculate category totals (excluding income)
+  Map<String, double> calculateCategoryTotals(List<ExpenseDetails> expenses) {
+    final Map<String, double> totals = {};
+
+    for (var expense in expenses) {
+      // Exclude income from category spending analysis
+      if (expense.category == Category.income) continue;
+
       final key = expense.category.label;
       totals[key] = (totals[key] ?? 0) + expense.amount;
     }
@@ -58,17 +64,38 @@ class _StatisticPageState extends State<StatisticPage> {
     return totals;
   }
 
+  // Calculate income, expenses, and net for a period (reusing GroupedTransactions logic)
+  Map<String, double> calculatePeriodFinancials(List<ExpenseDetails> expenses) {
+    double income = 0.0;
+    double expensesOut = 0.0;
+
+    for (var expense in expenses) {
+      if (expense.category == Category.income) {
+        income += expense.amount;
+      } else {
+        expensesOut += expense.amount;
+      }
+    }
+
+    return {
+      "income": income,
+      "expenses": expensesOut,
+      "net": income - expensesOut,
+    };
+  }
+
   // Get time period display text
-  String getPeriodDisplayText(String period) {
+  String getPeriodDisplayText(GroupingPeriod period) {
     final DateTime now = DateTime.now();
     switch (period) {
-      case 'weekly':
+      case GroupingPeriod.weekly:
         final weekStart = now.subtract(Duration(days: now.weekday - 1));
-        return 'This Week (${weekStart.day} - ${now.day})';
-      case 'monthly':
-        return 'This Month (${_getMonthName(now.month)} ${now.year})';
-      case 'yearly':
-        return 'This Year (${now.year})';
+        return 'This Week ';
+      case GroupingPeriod.monthly:
+        return 'This Month ';
+      case GroupingPeriod.yearly:
+        return 'This Year ';
+      case GroupingPeriod.daily:
       default:
         return 'All Time';
     }
@@ -94,14 +121,12 @@ class _StatisticPageState extends State<StatisticPage> {
 
   // Get category color
   Color getCategoryColor(String categoryName) {
-    // Find the category enum by name and return its color
     try {
       final category = Category.values.firstWhere(
         (cat) => cat.label == categoryName,
       );
       return category.color;
     } catch (e) {
-      // Return a default color if category not found
       return Colors.blue;
     }
   }
@@ -109,17 +134,24 @@ class _StatisticPageState extends State<StatisticPage> {
   // Build pie chart
   Widget buildPieChart(Map<String, double> categoryTotals) {
     if (categoryTotals.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.pie_chart, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text(
-              'No expenses to display',
-              style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            ),
-          ],
+      return Container(
+        height: 200,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.pie_chart, size: 64, color: Colors.grey),
+              SizedBox(height: 16),
+              Text(
+                'No expenses to display',
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              ),
+              Text(
+                'Only income recorded',
+                style: TextStyle(fontSize: 14, color: Colors.green),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -142,6 +174,7 @@ class _StatisticPageState extends State<StatisticPage> {
                 painter: PieChartPainter(
                   data: categoryTotals,
                   getCategoryColor: getCategoryColor,
+                  backgroundColor: Theme.of(context).colorScheme.surface,
                 ),
               ),
               Column(
@@ -203,7 +236,10 @@ class _StatisticPageState extends State<StatisticPage> {
   }
 
   // Build spending bars for a specific period
-  Widget buildSpendingBars(Map<String, double> categoryTotals, String period) {
+  Widget buildSpendingBars(
+    Map<String, double> categoryTotals,
+    GroupingPeriod period,
+  ) {
     if (categoryTotals.isEmpty) {
       return Expanded(
         child: Center(
@@ -213,7 +249,7 @@ class _StatisticPageState extends State<StatisticPage> {
               Icon(Icons.bar_chart, size: 64, color: Colors.grey),
               SizedBox(height: 16),
               Text(
-                'No expenses for ${period.toLowerCase()} period',
+                'No expenses for ${getPeriodDisplayText(period).toLowerCase()}',
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
             ],
@@ -224,7 +260,7 @@ class _StatisticPageState extends State<StatisticPage> {
 
     final maxAmount = categoryTotals.values.reduce((a, b) => a > b ? a : b);
     final sortedEntries = categoryTotals.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value)); // Sort by amount descending
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     return Expanded(
       child: Container(
@@ -361,45 +397,16 @@ class _StatisticPageState extends State<StatisticPage> {
         ),
         body: Consumer<ExpenseDatabase>(
           builder: (context, expenseDatabase, child) {
-            final expenses = expenseDatabase.currentExpenses;
+            final allExpenses = expenseDatabase.currentExpenses;
 
             return TabBarView(
               children: [
                 // Weekly tab
-                Column(
-                  children: [
-                    buildPieChart(calculateCategoryTotals(expenses, 'weekly')),
-                    SizedBox(height: 20),
-                    buildSpendingBars(
-                      calculateCategoryTotals(expenses, 'weekly'),
-                      'weekly',
-                    ),
-                  ],
-                ),
+                _buildPeriodView(allExpenses, GroupingPeriod.weekly),
                 // Monthly tab
-                Column(
-                  children: [
-                    buildPieChart(calculateCategoryTotals(expenses, 'monthly')),
-                    SizedBox(height: 20),
-
-                    buildSpendingBars(
-                      calculateCategoryTotals(expenses, 'monthly'),
-                      'monthly',
-                    ),
-                  ],
-                ),
+                _buildPeriodView(allExpenses, GroupingPeriod.monthly),
                 // Yearly tab
-                Column(
-                  children: [
-                    buildPieChart(calculateCategoryTotals(expenses, 'yearly')),
-                    SizedBox(height: 20),
-
-                    buildSpendingBars(
-                      calculateCategoryTotals(expenses, 'yearly'),
-                      'yearly',
-                    ),
-                  ],
-                ),
+                _buildPeriodView(allExpenses, GroupingPeriod.yearly),
               ],
             );
           },
@@ -407,54 +414,121 @@ class _StatisticPageState extends State<StatisticPage> {
       ),
     );
   }
-}
 
-// Custom Painter for Pie Chart
-class PieChartPainter extends CustomPainter {
-  final Map<String, double> data;
-  final Color Function(String) getCategoryColor;
+  Widget _buildPeriodView(
+    List<ExpenseDetails> allExpenses,
+    GroupingPeriod period,
+  ) {
+    final filteredExpenses = getExpensesForPeriod(allExpenses, period);
+    final categoryTotals = calculateCategoryTotals(filteredExpenses);
+    final periodFinancials = calculatePeriodFinancials(filteredExpenses);
 
-  PieChartPainter({required this.data, required this.getCategoryColor});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2;
-    final total = data.values.reduce((a, b) => a + b);
-
-    double startAngle = -math.pi / 2; // Start from top
-
-    for (final entry in data.entries) {
-      final sweepAngle = (entry.value / total) * 2 * math.pi;
-
-      final paint = Paint()
-        ..color = getCategoryColor(entry.key)
-        ..style = PaintingStyle.fill;
-
-      // Draw pie slice
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepAngle,
-        true,
-        paint,
-      );
-
-      startAngle += sweepAngle;
-    }
-
-    // Draw center circle (donut effect)
-    final centerPaint = Paint()
-      ..color =
-          Theme.of(
-            canvas as BuildContext? ?? Colors.white as dynamic,
-          ).colorScheme?.surface ??
-          Colors.white
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(center, radius * 0.4, centerPaint);
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          // Financial Summary Card
+          Container(
+            margin: EdgeInsets.all(20),
+            padding: EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              border: Border.all(color: Theme.of(context).colorScheme.primary),
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).colorScheme.tertiary,
+                  Theme.of(context).colorScheme.primary,
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.shade500.withOpacity(0.1),
+                  spreadRadius: 0.2,
+                  blurRadius: 0.2,
+                  offset: Offset(4, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Text(
+                  getPeriodDisplayText(period),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          'Income',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          '₦${periodFinancials["income"]!.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          'Expenses',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          '₦${periodFinancials["expenses"]!.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          'Net',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        Text(
+                          '₦${periodFinancials["net"]!.toStringAsFixed(0)}',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: periodFinancials["net"]! >= 0
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          buildPieChart(categoryTotals),
+          SizedBox(height: 20),
+          buildSpendingBars(categoryTotals, period),
+        ],
+      ),
+    );
   }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

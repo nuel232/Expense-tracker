@@ -1,8 +1,10 @@
 import 'package:expense_tracker/components/grouped_transactions.dart';
 import 'package:expense_tracker/database/expense_database.dart';
+import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/history_page.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
+import 'package:expense_tracker/util/finance_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +24,13 @@ class _DashboardPageState extends State<DashboardPage> {
         .currentExpenses
         .reversed
         .toList();
+    final allExpenses = expenseDatabase.currentExpenses;
+    final filteredExpenses = FinanceUtils.getExpensesForPeriod(
+      allExpenses,
+      GroupingPeriod.monthly,
+    );
+
+    final financials = FinanceUtils.calculatePeriodFinancials(filteredExpenses);
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -127,7 +136,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       SizedBox(height: 10),
 
                       Text(
-                        '₦120,000',
+                        ' ₦${financials['net']!.toStringAsFixed(0)}',
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.bold,
@@ -271,6 +280,7 @@ class _DashboardPageState extends State<DashboardPage> {
                   children: [
                     GroupedTransactions(
                       expenses: currentExpenses,
+                      groupingPeriod: GroupingPeriod.daily,
 
                       showDateTotals: false,
                       emptyMessage: 'No recent transactions',
