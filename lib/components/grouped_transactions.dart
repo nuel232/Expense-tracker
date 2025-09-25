@@ -1,6 +1,7 @@
 import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/util/transaction_tile.dart';
+import 'package:expense_tracker/util/finance_util.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -97,69 +98,6 @@ class GroupedTransactions extends StatelessWidget {
     }
   }
 
-  // Calculate income and expenses separately for a group
-  Map<String, double> calculateGroupInOut(List<ExpenseDetails> expenses) {
-    double income = 0.0;
-    double expensesOut = 0.0;
-
-    for (var expense in expenses) {
-      if (expense.category == Category.income) {
-        income += expense.amount;
-      } else {
-        expensesOut += expense.amount;
-      }
-    }
-
-    return {
-      "income": income,
-      "expenses": expensesOut,
-      "net": income - expensesOut,
-    };
-  }
-
-  // Calculate category totals for the current grouping
-  Map<String, double> calculateCategoryTotals(List<ExpenseDetails> expenses) {
-    final Map<String, double> totals = {};
-
-    for (var expense in expenses) {
-      // Exclude income from category spending analysis
-      if (expense.category == Category.income) continue;
-
-      final key = expense.category.label;
-      totals[key] = (totals[key] ?? 0) + expense.amount;
-    }
-
-    return totals;
-  }
-
-  // Filter expenses by current period (for weekly, monthly, yearly views)
-  List<ExpenseDetails> getFilteredExpensesForCurrentPeriod(
-    List<ExpenseDetails> expenses,
-  ) {
-    final DateTime now = DateTime.now();
-
-    return expenses.where((expense) {
-      switch (groupingPeriod) {
-        case GroupingPeriod.weekly:
-          final weekStart = now.subtract(Duration(days: now.weekday - 1));
-          final weekEnd = weekStart.add(Duration(days: 6));
-          return expense.date.isAfter(weekStart.subtract(Duration(days: 1))) &&
-              expense.date.isBefore(weekEnd.add(Duration(days: 1)));
-
-        case GroupingPeriod.monthly:
-          return expense.date.year == now.year &&
-              expense.date.month == now.month;
-
-        case GroupingPeriod.yearly:
-          return expense.date.year == now.year;
-
-        case GroupingPeriod.daily:
-        default:
-          return true;
-      }
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     // Group expenses by the specified period
@@ -187,7 +125,11 @@ class GroupedTransactions extends StatelessWidget {
             ]
           : sortedGroups.map((groupKey) {
               List<ExpenseDetails> groupExpenses = groupedExpenses[groupKey]!;
-              final totals = calculateGroupInOut(groupExpenses);
+
+              // Using FinanceUtils instead of local method
+              final totals = FinanceUtils.calculatePeriodFinancials(
+                groupExpenses,
+              );
               double income = totals["income"]!;
               double expensesOut = totals["expenses"]!;
 

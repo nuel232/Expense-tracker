@@ -23,29 +23,4 @@ class ExpenseDetails extends HiveObject {
     required this.date,
     required this.note,
   });
-
-  Map<String, dynamic> toMap() => {
-    'category': category.name, // save string name OR category.index
-    'amount': amount,
-    'date': date.toIso8601String(),
-    'note': note,
-  };
-
-  Map<String, double> calculateCategoryTotals(List<ExpenseDetails> expenses) {
-    final Map<String, double> totals = {};
-
-    for (var expense in expenses) {
-      final key = expense.category.label; // e.g. "Food", "Transport"
-      totals[key] = (totals[key] ?? 0) + expense.amount;
-    }
-
-    return totals;
-  }
-
-  static ExpenseDetails fromMap(Map m) => ExpenseDetails(
-    category: Category.values.firstWhere((e) => e.name == m['category']),
-    amount: (m['amount'] as num).toDouble(),
-    date: DateTime.parse(m['date'] as String),
-    note: m['note'] as String?,
-  );
 }

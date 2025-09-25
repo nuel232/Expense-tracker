@@ -21,16 +21,14 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget build(BuildContext context) {
     //Expense Database
     final expenseDatabase = context.watch<ExpenseDatabase>();
-    List<ExpenseDetails> currentExpenses = expenseDatabase
-        .currentExpenses
-        .reversed
-        .toList();
     final allExpenses = expenseDatabase.currentExpenses;
+
+    // Use FinanceUtils for consistent data processing
+    final currentExpenses = FinanceUtils.getSortedExpenses(allExpenses);
     final filteredExpenses = FinanceUtils.getExpensesForPeriod(
       allExpenses,
       GroupingPeriod.monthly,
     );
-
     final financials = FinanceUtils.calculatePeriodFinancials(filteredExpenses);
 
     // Create a NumberFormat instance for thousands separator
@@ -73,7 +71,6 @@ class _DashboardPageState extends State<DashboardPage> {
                   border: Border.all(
                     color: Theme.of(context).colorScheme.primary,
                   ),
-
                   gradient: LinearGradient(
                     colors: [
                       Theme.of(context).colorScheme.tertiary,
@@ -82,7 +79,6 @@ class _DashboardPageState extends State<DashboardPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(
@@ -111,11 +107,9 @@ class _DashboardPageState extends State<DashboardPage> {
                                 ),
                               ),
                               SizedBox(width: 6),
-
                               Icon(Icons.remove_red_eye_outlined, size: 20),
                             ],
                           ),
-
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -138,7 +132,6 @@ class _DashboardPageState extends State<DashboardPage> {
                         ],
                       ),
                       SizedBox(height: 10),
-
                       Text(
                         ' ₦${formatter.format(financials['net']!)}',
                         style: TextStyle(
@@ -154,14 +147,11 @@ class _DashboardPageState extends State<DashboardPage> {
               //budget and Expense
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
                 children: [
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                     margin: EdgeInsets.all(10),
-
                     decoration: BoxDecoration(
-                      // color: Colors.grey.shade200,
                       border: Border.all(
                         color: Theme.of(context).colorScheme.primary,
                       ),
@@ -173,9 +163,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-
                       borderRadius: BorderRadius.circular(10),
-
                       boxShadow: [
                         BoxShadow(
                           color: Colors.grey.shade500.withOpacity(0.1),
@@ -187,22 +175,18 @@ class _DashboardPageState extends State<DashboardPage> {
                     ),
                     child: Column(
                       children: [
-                        Text("Budget", style: TextStyle(fontSize: 20)),
+                        Text("Income", style: TextStyle(fontSize: 20)),
                         Text(
-                          '₦30,000',
+                          '₦${formatter.format(financials['income']!)}',
                           style: TextStyle(fontSize: 20, color: Colors.green),
                         ),
                       ],
                     ),
                   ),
-
-                  // SizedBox(width: 5),s
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 40, vertical: 20),
                     margin: EdgeInsets.all(10),
-
                     decoration: BoxDecoration(
-                      // color: Colors.grey.shade200,
                       gradient: LinearGradient(
                         colors: [
                           Theme.of(context).colorScheme.tertiary,
@@ -211,7 +195,6 @@ class _DashboardPageState extends State<DashboardPage> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
                         color: Theme.of(context).colorScheme.primary,
@@ -229,7 +212,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         Text("Expense", style: TextStyle(fontSize: 20)),
                         Text(
-                          '₦40,000',
+                          '₦${formatter.format(financials['expenses']!)}',
                           style: TextStyle(fontSize: 20, color: Colors.red),
                         ),
                       ],
@@ -273,19 +256,16 @@ class _DashboardPageState extends State<DashboardPage> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
-
                   borderRadius: BorderRadius.circular(12),
                 ),
                 constraints: BoxConstraints(
                   maxHeight: 350, // adjust to fit 5 tiles comfortably
                 ),
-
                 child: ListView(
                   children: [
                     GroupedTransactions(
                       expenses: currentExpenses,
                       groupingPeriod: GroupingPeriod.daily,
-
                       showDateTotals: false,
                       emptyMessage: 'No recent transactions',
                     ),

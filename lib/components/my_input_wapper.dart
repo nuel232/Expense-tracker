@@ -1,28 +1,20 @@
 import 'package:flutter/material.dart';
 
 class MyInputWrapper extends StatelessWidget {
-  final Widget? child; // the inner widget (TextField, Dropdown, etc.)
-  final String? labelText; // optional label
+  final Widget? child;
+  final String? labelText;
 
   const MyInputWrapper({super.key, this.child, this.labelText});
 
   @override
   Widget build(BuildContext context) {
-    return InputDecorator(
-      decoration: InputDecoration(
-        labelText: labelText,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        fillColor: Theme.of(context).colorScheme.secondary,
-        filled: true,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
+        borderRadius: BorderRadius.circular(12),
+        color: Theme.of(context).colorScheme.secondary,
       ),
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 16),
       child: child,
     );
   }

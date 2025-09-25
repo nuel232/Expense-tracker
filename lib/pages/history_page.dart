@@ -1,6 +1,7 @@
 import 'package:expense_tracker/components/grouped_transactions.dart';
 import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/models/expense_details.dart';
+import 'package:expense_tracker/util/finance_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,10 +17,11 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     //Expense Database
     final expenseDatabase = context.watch<ExpenseDatabase>();
-    List<ExpenseDetails> currentExpenses = expenseDatabase
-        .currentExpenses
-        .reversed
-        .toList();
+
+    // Use FinanceUtils for consistent data processing
+    final currentExpenses = FinanceUtils.getSortedExpenses(
+      expenseDatabase.currentExpenses,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -36,8 +38,6 @@ class _HistoryPageState extends State<HistoryPage> {
         margin: EdgeInsets.all(10),
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
-          // color: Colors.grey.shade200,
-          // border: Border.all(color: Colors.grey.shade400),
           border: Border.all(color: Theme.of(context).colorScheme.primary),
           boxShadow: [
             BoxShadow(
@@ -55,16 +55,13 @@ class _HistoryPageState extends State<HistoryPage> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-
           borderRadius: BorderRadius.circular(12),
         ),
-
         child: ListView(
           children: [
             GroupedTransactions(
               expenses: currentExpenses,
               groupingPeriod: GroupingPeriod.monthly,
-
               showDateTotals: true,
               emptyMessage: 'No recent transactions',
             ),

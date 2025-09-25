@@ -5,10 +5,10 @@ import 'package:expense_tracker/database/expense_database.dart';
 import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
+import 'package:expense_tracker/util/finance_util.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'dart:math' as math;
 
 // Import the enhanced GroupedTransactions
 import 'package:expense_tracker/components/grouped_transactions.dart';
@@ -21,107 +21,8 @@ class StatisticPage extends StatefulWidget {
 }
 
 class _StatisticPageState extends State<StatisticPage> {
-  // Helper method to get expenses filtered by period
-  List<ExpenseDetails> getExpensesForPeriod(
-    List<ExpenseDetails> expenses,
-    GroupingPeriod period,
-  ) {
-    final DateTime now = DateTime.now();
-
-    return expenses.where((expense) {
-      switch (period) {
-        case GroupingPeriod.weekly:
-          final weekStart = now.subtract(Duration(days: now.weekday - 1));
-          final weekEnd = weekStart.add(Duration(days: 6));
-          return expense.date.isAfter(weekStart.subtract(Duration(days: 1))) &&
-              expense.date.isBefore(weekEnd.add(Duration(days: 1)));
-
-        case GroupingPeriod.monthly:
-          return expense.date.year == now.year &&
-              expense.date.month == now.month;
-
-        case GroupingPeriod.yearly:
-          return expense.date.year == now.year;
-
-        case GroupingPeriod.daily:
-        default:
-          return true;
-      }
-    }).toList();
-  }
-
   // Create a NumberFormat instance for thousands separator
   final formatter = NumberFormat.decimalPattern();
-
-  // Calculate category totals (excluding income)
-  Map<String, double> calculateCategoryTotals(List<ExpenseDetails> expenses) {
-    final Map<String, double> totals = {};
-
-    for (var expense in expenses) {
-      // Exclude income from category spending analysis
-      if (expense.category == Category.income) continue;
-
-      final key = expense.category.label;
-      totals[key] = (totals[key] ?? 0) + expense.amount;
-    }
-
-    return totals;
-  }
-
-  // Calculate income, expenses, and net for a period (reusing GroupedTransactions logic)
-  Map<String, double> calculatePeriodFinancials(List<ExpenseDetails> expenses) {
-    double income = 0.0;
-    double expensesOut = 0.0;
-
-    for (var expense in expenses) {
-      if (expense.category == Category.income) {
-        income += expense.amount;
-      } else {
-        expensesOut += expense.amount;
-      }
-    }
-
-    return {
-      "income": income,
-      "expenses": expensesOut,
-      "net": income - expensesOut,
-    };
-  }
-
-  // Get time period display text
-  String getPeriodDisplayText(GroupingPeriod period) {
-    final DateTime now = DateTime.now();
-    switch (period) {
-      case GroupingPeriod.weekly:
-        final weekStart = now.subtract(Duration(days: now.weekday - 1));
-        return 'This Week ';
-      case GroupingPeriod.monthly:
-        return 'This Month ';
-      case GroupingPeriod.yearly:
-        return 'This Year ';
-      case GroupingPeriod.daily:
-      default:
-        return 'All Time';
-    }
-  }
-
-  String _getMonthName(int month) {
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return months[month - 1];
-  }
 
   // Get category color
   Color getCategoryColor(String categoryName) {
@@ -186,7 +87,7 @@ class _StatisticPageState extends State<StatisticPage> {
                 children: [
                   Text(
                     "₦${formatter.format(total)}",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     "Total",
@@ -254,7 +155,7 @@ class _StatisticPageState extends State<StatisticPage> {
               Icon(Icons.bar_chart, size: 64, color: Colors.grey),
               SizedBox(height: 16),
               Text(
-                'No expenses for ${getPeriodDisplayText(period).toLowerCase()}',
+                'No expenses for ${FinanceUtils.getPeriodDisplayText(period).toLowerCase()}',
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
             ],
@@ -295,7 +196,7 @@ class _StatisticPageState extends State<StatisticPage> {
         mainAxisSize: MainAxisSize.min, // Important: Don't expand to fill
         children: [
           Text(
-            getPeriodDisplayText(period),
+            FinanceUtils.getPeriodDisplayText(period),
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           SizedBox(height: 20),
@@ -413,9 +314,17 @@ class _StatisticPageState extends State<StatisticPage> {
     List<ExpenseDetails> allExpenses,
     GroupingPeriod period,
   ) {
-    final filteredExpenses = getExpensesForPeriod(allExpenses, period);
-    final categoryTotals = calculateCategoryTotals(filteredExpenses);
-    final periodFinancials = calculatePeriodFinancials(filteredExpenses);
+    // Use FinanceUtils instead of local methods
+    final filteredExpenses = FinanceUtils.getExpensesForPeriod(
+      allExpenses,
+      period,
+    );
+    final categoryTotals = FinanceUtils.calculateCategoryTotals(
+      filteredExpenses,
+    );
+    final periodFinancials = FinanceUtils.calculatePeriodFinancials(
+      filteredExpenses,
+    );
 
     return SingleChildScrollView(
       child: Column(
@@ -447,7 +356,7 @@ class _StatisticPageState extends State<StatisticPage> {
             child: Column(
               children: [
                 Text(
-                  getPeriodDisplayText(period),
+                  FinanceUtils.getPeriodDisplayText(period),
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(height: 15),
