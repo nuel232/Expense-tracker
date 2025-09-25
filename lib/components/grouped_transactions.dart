@@ -127,6 +127,7 @@ class GroupedTransactions extends StatelessWidget {
               final totals = calculateGroupInOut(dayExpenses);
               double income = totals["income"]!;
               double expensesOut = totals["expenses"]!;
+              double net = totals["net"]!;
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
