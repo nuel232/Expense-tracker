@@ -6,6 +6,7 @@ import 'package:expense_tracker/pages/history_page.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:expense_tracker/util/finance_util.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -31,6 +32,9 @@ class _DashboardPageState extends State<DashboardPage> {
     );
 
     final financials = FinanceUtils.calculatePeriodFinancials(filteredExpenses);
+
+    // Create a NumberFormat instance for thousands separator
+    final formatter = NumberFormat.decimalPattern();
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -136,7 +140,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       SizedBox(height: 10),
 
                       Text(
-                        ' ₦${financials['net']!.toStringAsFixed(0)}',
+                        ' ₦${formatter.format(financials['net']!)}',
                         style: TextStyle(
                           fontSize: 35,
                           fontWeight: FontWeight.bold,

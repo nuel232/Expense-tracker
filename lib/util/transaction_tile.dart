@@ -18,7 +18,7 @@ class TransactionTile extends StatelessWidget {
     final formatter = NumberFormat.decimalPattern();
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: expenseDetails.category.color.withOpacity(0.1),
+        backgroundColor: expenseDetails.category.color.withOpacity(0.2),
         child: Icon(
           expenseDetails.category.icon,
           color: expenseDetails.category.color,

@@ -6,6 +6,7 @@ import 'package:expense_tracker/models/category.dart';
 import 'package:expense_tracker/models/expense_details.dart';
 import 'package:expense_tracker/pages/profile_page.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'dart:math' as math;
 
@@ -48,6 +49,9 @@ class _StatisticPageState extends State<StatisticPage> {
       }
     }).toList();
   }
+
+  // Create a NumberFormat instance for thousands separator
+  final formatter = NumberFormat.decimalPattern();
 
   // Calculate category totals (excluding income)
   Map<String, double> calculateCategoryTotals(List<ExpenseDetails> expenses) {
@@ -181,7 +185,7 @@ class _StatisticPageState extends State<StatisticPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "₦${total.toStringAsFixed(0)}",
+                    "₦${formatter.format(total)}",
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
@@ -241,7 +245,8 @@ class _StatisticPageState extends State<StatisticPage> {
     GroupingPeriod period,
   ) {
     if (categoryTotals.isEmpty) {
-      return Expanded(
+      return Container(
+        height: 200, // Fixed height instead of Expanded
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -262,81 +267,70 @@ class _StatisticPageState extends State<StatisticPage> {
     final sortedEntries = categoryTotals.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    return Expanded(
-      child: Container(
-        margin: EdgeInsets.all(20),
-        padding: EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          border: Border.all(color: Theme.of(context).colorScheme.primary),
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.tertiary,
-              Theme.of(context).colorScheme.primary,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return Container(
+      margin: EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.tertiary,
+            Theme.of(context).colorScheme.primary,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade500.withOpacity(0.1),
+            spreadRadius: 0.2,
+            blurRadius: 0.2,
+            offset: Offset(4, 4),
           ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.shade500.withOpacity(0.1),
-              spreadRadius: 0.2,
-              blurRadius: 0.2,
-              offset: Offset(4, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              getPeriodDisplayText(period),
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: ListView.builder(
-                itemCount: sortedEntries.length,
-                itemBuilder: (context, index) {
-                  final entry = sortedEntries[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              entry.key,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Important: Don't expand to fill
+        children: [
+          Text(
+            getPeriodDisplayText(period),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 20),
+          // Use Column instead of Expanded ListView for better scrolling
+          ...sortedEntries
+              .map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            entry.key,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
                             ),
-                            Text(
-                              '${((entry.value / maxAmount) * 100).toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 4),
-                        CategorySpendingBar(
-                          category: entry.key,
-                          amount: entry.value,
-                          maxAmount: maxAmount,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 4),
+                      CategorySpendingBar(
+                        category: entry.key,
+                        amount: entry.value,
+                        maxAmount: maxAmount,
+                      ),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
+        ],
       ),
     );
   }
@@ -470,7 +464,7 @@ class _StatisticPageState extends State<StatisticPage> {
                           ),
                         ),
                         Text(
-                          '₦${periodFinancials["income"]!.toStringAsFixed(0)}',
+                          '₦${formatter.format(periodFinancials["income"]!)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -489,7 +483,7 @@ class _StatisticPageState extends State<StatisticPage> {
                           ),
                         ),
                         Text(
-                          '₦${periodFinancials["expenses"]!.toStringAsFixed(0)}',
+                          '₦${formatter.format(periodFinancials["expenses"]!)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -508,7 +502,7 @@ class _StatisticPageState extends State<StatisticPage> {
                           ),
                         ),
                         Text(
-                          '₦${periodFinancials["net"]!.toStringAsFixed(0)}',
+                          '₦${formatter.format(periodFinancials["net"]!)}',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -527,6 +521,7 @@ class _StatisticPageState extends State<StatisticPage> {
           buildPieChart(categoryTotals),
           SizedBox(height: 20),
           buildSpendingBars(categoryTotals, period),
+          SizedBox(height: 20), // Add bottom padding
         ],
       ),
     );
