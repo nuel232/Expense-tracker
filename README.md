@@ -38,7 +38,7 @@ A modern, feature-rich expense tracking application built with Flutter that help
 
 | Dashboard | Add Expense | Statistics | History |
 |-----------|-------------|------------|---------|
-| ![Dashboard](lib/assets/img/dashboard.png) | ![Add Expense](lib/assets/img/add_expense.png) | ![Statistics](lib/assets/img/statistics.png) | ![History](lib/assets/img/history.png) |
+| ![Dashboard](lib/assets/img/dashboard.png) | ![Add Expense](lib/assets/img/expense.png) | ![Statistics](lib/assets/img/statistics.png) | ![History](lib/assets/img/history.png) |
 
 ## 🚀 Getting Started
 
