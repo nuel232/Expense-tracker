@@ -9,7 +9,7 @@ A modern, feature-rich expense tracking application built with Flutter that help
 - ✅ Add and categorize income & expenses
 - ✅ Real-time balance calculation
 - ✅ Multi-currency support (₦ Naira)
-- ✅ Date-based transaction organization
+- ✅ Date-based transaction organization.
 
 ### 📈 **Analytics & Insights**
 
